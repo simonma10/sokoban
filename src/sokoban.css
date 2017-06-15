@@ -1,0 +1,35 @@
+@font-face {
+    font-family: blockt;
+    src: url('./assets/fonts/Blockt.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: technolin;
+    src: url('./assets/fonts/technolin.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+ body {
+        padding: 0px;
+        margin: 0px;
+        background-color: white;
+        font-family: blockt;
+        color: blue;
+}
+
+
+p {
+    font-family: blockt;
+    /*font-weight: bold;
+    */
+    font-size: 58px;
+
+    background-color: black;
+
+    color: white;
+    padding: 5px;
+
+}
