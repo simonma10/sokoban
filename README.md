@@ -1,3 +1,13 @@
+# Sokoban
+#### Clone of the famous "Warehouse Man" game, using Phaser
+
+Doesn't actually use the Phaser + ES6 + Webpack starter project yet.
+
+Run with ```live-server``` and navigate to localhost:8080 
+
+
+
+
 # Phaser + ES6 + Webpack.
 #### A bootstrap project to create games with Phaser + ES6 + Webpack.
 
