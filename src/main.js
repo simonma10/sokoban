@@ -1,16 +1,15 @@
-var Sokoban = Sokoban || {};
+import GameState from './states/GameState'
+import HomeState from './states/HomeState'
+import WinState from './states/WinState'
 
-/*var sgs = require('./states/GameState');
-var shs = require('./states/HomeState');
-var sws = require('./states/WinState');*/
-//var sls = require('./states/LoadState');
+class Game extends Phaser.Game {
+    constructor () {
+        super(1024, 768, Phaser.AUTO);
+        this.state.add('GameState', GameState);
+        this.state.add('HomeState', HomeState);
+        this.state.add('WinState', WinState);
+        this.state.start('HomeState');
+    }
+}
 
-
-Sokoban.game = new Phaser.Game(1024,768 , Phaser.AUTO);
-
-Sokoban.game.state.add('GameState', Sokoban.GameState);
-Sokoban.game.state.add('HomeState', Sokoban.HomeState);
-Sokoban.game.state.add('WinState', Sokoban.WinState);
-
-//Sokoban.game.state.add('LoadState', Sokoban.LoadState);
-Sokoban.game.state.start('HomeState');
+new Game ()

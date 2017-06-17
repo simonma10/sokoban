@@ -1,13 +1,17 @@
 {
   "name": "Sokoban",
-  "version": "0.2.0",
-  "description": "Sokoban Clone",
+  "version": "0.3.0",
+  "description": "Sokoban",
   "author": "Simon Martin",
-  "main": "index.js",
+  "main": "./src/main.js",
   "scripts": {
     "dev": "webpack",
     "deploy": "webpack --config webpack.production.config.js",
     "test": "eslint ./src/**/**.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simonma10/sokoban"
   },
   "license": "MIT",
   "devDependencies": {

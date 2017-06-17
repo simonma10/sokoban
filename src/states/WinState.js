@@ -1,14 +1,14 @@
-/**
- * Created by Simon on 3/06/2017.
- */
-var Sokoban = Sokoban || {};
 
-Sokoban.WinState = {
-    init: function(){
+class WinState extends Phaser.State {
+    constructor () {
+        super ()
+    }
 
-    },
+    init () {
 
-    create: function(){
+    }
+
+    create () {
         var titleText = this.game.add.text(this.game.world.centerX, this.game.world.centerY - 200,
             "You Win!!", {font: "bold 64pt Arial", fill:"#FFFFFF"});
         titleText.anchor.setTo(0.5);
@@ -18,3 +18,5 @@ Sokoban.WinState = {
             this.game.state.start('HomeState', true, false)};
     }
 }
+
+export default WinState;

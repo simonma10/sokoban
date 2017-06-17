@@ -1,78 +1,69 @@
 # Sokoban
-#### Clone of the famous "Warehouse Man" game, using Phaser
+#### Clone of the Sokoban game, using Phaser
 
-Doesn't actually use the Phaser + ES6 + Webpack starter project yet.
+This is a basic Webpack 2.x template for use with Phaser and ES6/2015.
 
-Run with ```live-server``` and navigate to localhost:8080 
+It is very much a work in progress!!
 
+## Getting Started
+You need [Node.js and npm](https://nodejs.org/). 
 
+Clone the repository (or download the ZIP file)
 
+`git clone https://github.com/simonma10/sokoban`
 
-# Phaser + ES6 + Webpack.
-#### A bootstrap project to create games with Phaser + ES6 + Webpack.
+Install dependencies
 
-![Phaser+ES6+Webpack](https://raw.githubusercontent.com/lean/phaser-es6-webpack/master/assets/images/phaser-es6-webpack.jpg)
+`npm install`
 
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+## Scripts
 
+####Dev
 
-## Features
-- ESLINT with JavaScript Standard Style configuration
-- Next generation of Javascript
-- Webpack ready
-- Multiple browser testing
-- WebFont Loader
+Run a development build...
 
+`npm run dev`
 
-# Setup
-To use this bootstrap you’ll need to install a few things before you have a working copy of the project.
+Your ES6 code will be transpiled into ES5 and concatenated into a single file called `bundle.js`.
+A sourcemap for your code will also be included (by default `bundle.js.map`).
+Phaser modules and dependencies will be transpiled and concatenated into `vendor.bundle.js`, with a sourcemap (`vendor.bundle.js.map`).
 
-## 1. Clone this repo:
+Any modification to the files inside the `./src` and `./static` folder will trigger a full page reload.
 
-Navigate into your workspace directory.
-
-Run:
-
-```git clone https://github.com/lean/phaser-es6-webpack.git```
-
-## 2. Install node.js and npm:
-
-https://nodejs.org/en/
+If you modify the contents of other files, please manually restart the server.
 
 
-## 3. Install dependencies (optionally you could install [yarn](https://yarnpkg.com/)):
+####Prod
 
-Navigate to the cloned repo’s directory.
+Run a production build:
 
-Run:
+`npm run prod`
 
-```npm install``` 
-
-or if you choose yarn, just run ```yarn```
-
-## 4. Run the development server:
-
-Run:
-
-```npm run dev```
-
-This will run a server so you can run the game in a browser.
-
-Open your browser and enter localhost:3000 into the address bar.
-
-Also this will start a watch process, so you can change the source and the process will recompile and refresh the browser
+Creates production-ready `bundle.js` and `vendor.bundle.js` in the `\dist` folder.
 
 
-## Build for deployment:
+####Test
+Run eslint:
 
-Run:
+`npm run test`
 
-```npm run deploy```
 
-This will optimize and minimize the compiled bundle.
+
+
+## Contributing
+
+Please report any bugs or add requests on [Github Issues](https://github.com/simonma10/sokoban/issues).
+
+
+## License
+
+This project is released under the MIT License (even though it should be spelt 'Licence').
 
 ## Credits
-Big thanks to this great repos:
+
+Respect to the owners of the following projects:
+
+https://github.com/lean/phaser-es6-webpack.git
 
 https://github.com/belohlavek/phaser-es6-boilerplate
 

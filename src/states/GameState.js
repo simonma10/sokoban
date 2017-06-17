@@ -1,66 +1,53 @@
-/**
- * Created by Simon on 27/05/2017.
- * @@Version 0.2
- */
+import Level from '../prefabs/level';
+import Crate from '../prefabs/crate';
+import Player from '../prefabs/player';
+import {ICON_SIZE, EMPTY, WALL, SPOT, CRATE, PLAYER, FLY_TIME, debug}  from '../constants';
 
-var Sokoban = Sokoban || {};
+class GameState extends Phaser.State {
+    constructor () {
+        super ()
 
-//level layout constants
-const ICON_SIZE = 64;
-const EMPTY = 0;
-const WALL = 1;
-const SPOT = 2;
-const CRATE = 3;
-const PLAYER = 4;
+        this.data = null;
+        this.level = null;
+        this.player = null;
+        this.crates = [];
+        this.moveText = ''
+        this.levelText = '';
+        this.undo = [];
+    }
 
-//global variables
-var debug = true;
-var data;
-var level;
-var player;
-var crates = [];
-var maxLevel;
-var moveText, levelText;
-var undo = [];
-
-Sokoban.GameState = {
-    init: function(currentLevel){
+    init (currentLevel){
         //set up page scaling
-        //this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
 
         //initialise level and undo array
         this.currentLevel = currentLevel ? currentLevel : 1;
-        undo=[];
-    },
+        this.undo=[];
+    }
 
-    preload: function(){
-        this.load.json('data', './assets/data/soko_levels.json');
+    preload () {
+        this.load.json('data', '../static/data/soko_levels.json');
 
-        this.load.spritesheet('player', './assets/player.png', ICON_SIZE, ICON_SIZE, 12);
-        this.load.spritesheet('crate', './assets/crate.png', ICON_SIZE, ICON_SIZE, 15);
-        this.load.spritesheet('block', './assets/block.png', ICON_SIZE, ICON_SIZE, 3);
-        this.load.spritesheet('spot', './assets/spot.png', ICON_SIZE, ICON_SIZE, 3);
-        this.load.image('redParticle', './assets/redParticle.png');
+        this.load.spritesheet('player', '../static/images/player.png', ICON_SIZE, ICON_SIZE, 12);
+        this.load.spritesheet('crate', '../static/images/crate.png', ICON_SIZE, ICON_SIZE, 15);
+        this.load.spritesheet('block', '../static/images/block.png', ICON_SIZE, ICON_SIZE, 3);
+        this.load.spritesheet('spot', '../static/images/spot.png', ICON_SIZE, ICON_SIZE, 3);
+        this.load.image('redParticle', '../static/images/redParticle.png');
+    }
 
-    },
-
-    create:function(){
+    create () {
         //open json file and load level
-        data = this.game.cache.getJSON('data');
-        if(!data){
-            if(debug){console.log("Data file not found!")}
+        this.data = this.game.cache.getJSON('data');
+        if(!this.data){
+            if(debug){console.log("Data file not found.  Game will now exit.")}
             this.game.destroy();
         }
-        if(this.currentLevel > data.maxlevels){
-            //TODO: something a little more exciting for winning the game!
-            //this.game.state.start('WinState', true, false);
-        }
-        level = new Sokoban.Level(data, this.currentLevel);
-        this.drawBoard(level);
+        this.level = new Level(this.data, this.currentLevel);
+        this.drawBoard();
 
-
+        //cursor key input
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.cursors.up.onDown.add(this.processInput, this);
         this.cursors.down.onDown.add(this.processInput, this);
@@ -74,21 +61,21 @@ Sokoban.GameState = {
         //undo move
         var keyZ = this.game.input.keyboard.addKey(Phaser.Keyboard.Z);
         keyZ.onDown.add(this.undoMove, this);
-        //TODO: undo array and button (next version)
 
-    },
-
-    update: function(){
-        moveText.text = "Moves: " + player.moveCounter;
-    },
-
-    render: function(){
+        //debug only: go to next level
         if(debug){
-            //this.game.debug.text(undo.length + ", " + player.sprite.y, 32,32);
+            var keyN = this.game.input.keyboard.addKey(Phaser.Keyboard.N);
+            keyN.onDown.add(this.gameWin, this);
         }
-    },
+    }
 
-    processInput: function(keyboard){
+    update () {
+        if(this.player){
+            this.moveText.text = "Moves: " + this.player.moveCounter;
+        }
+    }
+
+    processInput (keyboard) {
         var dx=0;
         var dy=0;
         var anim="";
@@ -112,101 +99,98 @@ Sokoban.GameState = {
             default:
                 break;
         }
-        var targetRow = player.gridY + dy;
-        var targetCell = player.gridX + dx;
-        var result = level.getCell(targetCell, targetRow);
+
+        const px = this.player.gridX;
+        const py = this.player.gridY;
+        const tarY = py + dy;
+        const tarX = px + dx;
+        const result = this.level.getCell(tarX, tarY);
+        console.log(result);
 
         if(result === EMPTY || result === SPOT || result === PLAYER){
-            //console.log(result, level.getCell(player.gridX, player.gridY));
-            if(debug){console.log("Moving player from " + player.gridX + ", " + player.gridY + " to " + targetCell + ", " + targetRow + anim)}
-            if(level.getCell(player.gridX, player.gridY) === PLAYER + SPOT){
-                level.setCell(player.gridX, player.gridY, SPOT);
+            //if(debug){console.log("Moving player from " + this.player.gridX + ", " + this.player.gridY + " to " + tarX + ", " + tarY + " with anim= " + anim)}
+            if(this.level.getCell(px, py) === PLAYER + SPOT){
+                this.level.setCell(px, py, SPOT);
             } else {
-                level.setCell(player.gridX, player.gridY, EMPTY);
+                this.level.setCell(px, py, EMPTY);
             }
 
-            player.move(targetCell, targetRow, anim);
+            this.player.move(tarX, tarY, anim);
 
             if(result === SPOT){
-                level.setCell(targetCell, targetRow, PLAYER + SPOT);
+                this.level.setCell(tarX, tarY, PLAYER + SPOT);
             } else {
-                level.setCell(targetCell, targetRow, PLAYER);
+                this.level.setCell(tarX, tarY, PLAYER);
             }
+            this.storeMove(this.level);
 
-            //if(debug){console.log(level.toString())}
-            this.storeMove(level);
-
-            //pushing crate
+        //pushing crate
         } else if(result === CRATE || result === CRATE + SPOT){
-            var crateTargetRow = targetRow + dy;
-            var crateTargetCell = targetCell + dx;
-            var crateResult = level.getCell(crateTargetCell, crateTargetRow);
+            const crateTarY = tarY + dy;
+            const crateTarX = tarX + dx;
+            const crateResult = this.level.getCell(crateTarX, crateTarY);
             //FIXME: check for Player moving CRATE+SPOT onto another CRATE+SPOT
             if(crateResult === EMPTY || crateResult === SPOT || crateResult === CRATE + SPOT){
-                crates.forEach(function(crate){
-                   if(crate.gridX === targetCell && crate.gridY === targetRow){
+                for (let crate of this.crates) {
+                    if(crate.gridX === tarX && crate.gridY === tarY){
+                        if(this.level.getCell(this.player.gridX, this.player.gridY) === PLAYER + SPOT){
+                           this.level.setCell(this.player.gridX, this.player.gridY, SPOT);
+                        } else {
+                           this.level.setCell(this.player.gridX, this.player.gridY, EMPTY);
+                        }
 
-                       if(level.getCell(player.gridX, player.gridY) === PLAYER + SPOT){
-                           level.setCell(player.gridX, player.gridY, SPOT);
-                       } else {
-                           level.setCell(player.gridX, player.gridY, EMPTY);
-                       }
-
-                       player.move(targetCell, targetRow, anim);
+                        this.player.move(tarX, tarY, anim);
 
                        if(result === CRATE + SPOT){
-                           level.setCell(targetCell, targetRow, PLAYER + SPOT);
+                           this.level.setCell(tarX, tarY, PLAYER + SPOT);
                        } else {
-                           level.setCell(targetCell, targetRow, PLAYER);
+                           this.level.setCell(tarX, tarY, PLAYER);
                        }
 
-                       level.setCell(crateTargetCell, crateTargetRow, CRATE);
-                       crate.move(crateTargetCell, crateTargetRow);
+                       this.level.setCell(crateTarX, crateTarY, CRATE);
+                       crate.move(crateTarX, crateTarY, 200);
                        if(crateResult === SPOT){
-                           level.setCell(crateTargetCell, crateTargetRow, CRATE + SPOT);
+                           this.level.setCell(crateTarX, crateTarY, CRATE + SPOT);
 
-                           if(level.checkWin() === 0){
+                           if(this.level.checkWin() === 0){
                                this.gameWin();
                            }
                        }
-                       //if(debug){console.log(level.toString())}
-                       this.storeMove(level);
+                       this.storeMove(this.level);
                    }
-                }, this);
+                }
             }
         }
 
-    },
+    }
 
-    drawBoard: function(level){
-        for (var i=0; i < level.height; i++){
-            //var row = board.levelData[i];
-
-            for (var j=0; j < level.width; j++){
-
+    drawBoard () {
+        const level = this.level;
+        for (let i=0; i < level.height; i++){
+            for (let j=0; j < level.width; j++){
                 switch (level.getCell(j, i)){
                     case EMPTY:
                         //this.game.add.sprite(j*ICON_SIZE, i*ICON_SIZE, 'blank');
                         break;
                     case WALL:
-                        this.game.add.sprite(j*ICON_SIZE, i*ICON_SIZE, 'block',0);
+                        this.wallAnim(j, i);
                         break;
                     case SPOT:
                         this.game.add.sprite(j*ICON_SIZE, i*ICON_SIZE, 'spot', 1);
                         break;
                     case CRATE:
-                        crates.push(new Sokoban.Crate(this.game, j, i, 'crate'));
+                        this.crates.push(new Crate(this.game, j, i, 'crate'));
                         break;
                     case PLAYER:
-                        player = new Sokoban.Player(this.game, j*ICON_SIZE, i*ICON_SIZE, 'player', j, i);
+                        this.player = new Player(this.game, j*ICON_SIZE, i*ICON_SIZE, 'player', j, i);
                         break;
                     case CRATE + SPOT:
                         this.game.add.sprite(j*ICON_SIZE, i*ICON_SIZE, 'spot', 1);
-                        crates.push(new Sokoban.Crate(this.game, j, i, 'crate'));
+                        this.crates.push(new Crate(this.game, j, i, 'crate'));
                         break;
                     case PLAYER + SPOT:
                         this.game.add.sprite(j*ICON_SIZE, i*ICON_SIZE, 'spot', 1);
-                        player = new Sokoban.Player(this.game, j*ICON_SIZE, i*ICON_SIZE, 'player', j, i);
+                        this.player = new Player(this.game, j*ICON_SIZE, i*ICON_SIZE, 'player', j, i);
                         break;
                     default:
                         break;
@@ -214,19 +198,18 @@ Sokoban.GameState = {
             }
         }
 
-        levelText = this.game.add.text(64,16,"Level " + this.currentLevel, {fill: "#FFFFFF"});
-        moveText = this.game.add.text(825,16,"Moves: " + player.moveCounter, {fill: "#FFFFFF"});
+        this.levelText = this.game.add.text(64,16,"Level " + this.currentLevel, {fill: "#FFFFFF"});
+        this.moveText = this.game.add.text(825,16,"Moves: " + this.player.getMoveCount(), {fill: "#FFFFFF"});
+    }
 
-
-    },
-
-    storeMove: function(level){
-        var tempBoard = new Sokoban.Board();
+    storeMove (level) {
+        /*var tempBoard = new Board();
         tempBoard.setData(level.board.getData());
-        undo.push(tempBoard.data.toString());
-    },
+        this.undo.push(tempBoard.data.toString());*/
+    }
 
-    undoMove: function(){
+    undoMove () {
+        let undo = this.undo;
         if (undo.length > 1){
             undo.pop();
             var rawString = undo.pop();
@@ -234,10 +217,10 @@ Sokoban.GameState = {
             var rawData = rawString.split(',');
 
             var undoBoard = new Sokoban.Board();
-            for(var i = 0; i < level.height; i++){
+            for(var i = 0; i < this.level.height; i++){
                 var tempRow = [];
                 for(var j = 0; j < level.width; j++){
-                    tempRow.push(parseInt(rawData[(i * level.width)+ j]));
+                    tempRow.push(parseInt(rawData[(i * this.level.width)+ j]));
                     //undoBoard.setCell(j, i, rawData[(i * level.width)+ j]);
                 }
                 undoBoard.data.push(tempRow);
@@ -250,44 +233,44 @@ Sokoban.GameState = {
             this.game.world.forEach(function(sprite){
                 sprite.kill();
             }, this);
-            var tempMoveCounter = player.moveCounter;
-            player.destroy();
-            crates = [];
+            var tempMoveCounter = this.player.moveCounter;
+            this.player.destroy();
+            this.crates = [];
 
             //redraw the board
-            level.board.setData(undoBoard.getData());
-            this.drawBoard(level);
-            player.moveCounter = tempMoveCounter - 1;
+            this.level.board.setData(undoBoard.getData());
+            this.drawBoard(this.level);
+            this.player.moveCounter = tempMoveCounter - 1;
         }
+    }
 
-
-
-    },
-
-    restartLevel: function(){
+    restartLevel () {
         this.game.state.start('GameState', true, false, this.currentLevel);
-    },
+    }
 
-    gameWin: function(){
-
-        var timer = this.game.time.events.add(Phaser.Timer.SECOND * 2, function(){
+    gameWin () {
+        const timer = this.game.time.events.add(Phaser.Timer.SECOND * 2, function(){
             this.currentLevel += 1;
-
-            if (this.currentLevel >= parseInt(data.maxlevels)){
-
-                crates.forEach(function(crate){
+            if (this.currentLevel >= parseInt(this.data.maxlevels)){
+                for (let crate of this.crates){
                     crate.explode();
-                }, this);
+                }
                 this.game.state.start('WinState', true, true);
             } else {
                 this.game.state.start('GameState', true, true, this.currentLevel);
             }
-
         }, this);
 
-        var winText = this.game.add.text(this.game.world.centerX,this.game.world.centerY,"Level Complete!", {font: "bold 64pt Arial", fill: "#FFFFFF"});
+        const winText = this.game.add.text(this.game.world.centerX,this.game.world.centerY,"Level Complete!", {font: "bold 64pt Arial", fill: "#FFFFFF"});
         winText.anchor.setTo(0.5);
+    }
 
+    wallAnim (gridX, gridY) {
+        let wall = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'block', 0);
+        const wallMove = this.game.add.tween(wall);
+        wallMove.to({x: gridX * ICON_SIZE, y: gridY * ICON_SIZE}, FLY_TIME);
+        wallMove.start();
     }
 }
 
+export default GameState;
