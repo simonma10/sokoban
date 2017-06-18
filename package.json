@@ -6,7 +6,7 @@
   "main": "./src/main.js",
   "scripts": {
     "dev": "webpack",
-    "deploy": "webpack --config webpack.production.config.js",
+    "prod": "webpack --config webpack.production.config.js",
     "test": "eslint ./src/**/**.js"
   },
   "repository": {

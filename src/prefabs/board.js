@@ -9,38 +9,32 @@ class Board {
         this.data = [];
     }
 
-    getCell (x,y) {
-        var row = this.data[y];
+    getCell (x, y) {
+        let row = this.data[y];
         return row[x];
     }
 
     setCell (x, y, value) {
-        var row = this.data[y];
+        let row = this.data[y];
         row[x] = value;
     }
 
-    getData (){
+    getData () {
         return this.data;
     }
 
-    setData (data){
-        //console.log("data" + data);
+    setData (data) {
         this.data = data;
     }
 
     toString () {
-        var result = "";
-        for (var i = 0; i < this.data.length; i++){
-            var row = this.data[i];
-            result += row + "\n";
+        let result = '';
+        for (let i = 0; i < this.data.length; i++) {
+            let row = this.data[i];
+            result += row + '\n';
         }
         return result;
     }
 }
 
 export default Board;
-
-
-
-
-

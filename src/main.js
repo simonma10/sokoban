@@ -1,3 +1,5 @@
+import Phaser from 'phaser-ce';
+
 import GameState from './states/GameState'
 import HomeState from './states/HomeState'
 import WinState from './states/WinState'
@@ -12,4 +14,4 @@ class Game extends Phaser.Game {
     }
 }
 
-new Game ()
+new Game()

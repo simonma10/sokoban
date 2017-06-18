@@ -12,7 +12,8 @@
     "import/no-unresolved": ["error"],
     "semi": ["off"],
     "indent": ["off"],
-    "no-new": ["warn"]
+    "no-new": ["warn"],
+    "no-unneeded-ternary": ["warn"]
   },
   "globals": {
     "phaser": true

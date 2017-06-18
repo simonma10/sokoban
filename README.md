@@ -18,7 +18,7 @@ Install dependencies
 
 ## Scripts
 
-####Dev
+### Dev
 
 Run a development build...
 
@@ -33,7 +33,7 @@ Any modification to the files inside the `./src` and `./static` folder will trig
 If you modify the contents of other files, please manually restart the server.
 
 
-####Prod
+### Prod
 
 Run a production build:
 
@@ -42,7 +42,7 @@ Run a production build:
 Creates production-ready `bundle.js` and `vendor.bundle.js` in the `\dist` folder.
 
 
-####Test
+### Test
 Run eslint:
 
 `npm run test`
