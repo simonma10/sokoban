@@ -11,7 +11,7 @@ class Player extends Phaser.Sprite {
             console.log('Player: ' + this.gridX + ', ' + this.gridY)
         }
         this.game = game;
-        this.sprite = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'player');
+        this.sprite = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'playerSprite');
         this.move(gridX, gridY, FLY_TIME, DELAY, 'down');
         this.moveCounter = 0;
 
